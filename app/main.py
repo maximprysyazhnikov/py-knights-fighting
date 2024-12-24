@@ -2,7 +2,8 @@ from typing import Dict, List, Optional
 
 
 class Knight:
-    def __init__(self, name: str, power: int, hp: int, armour: Optional[List[Dict]], weapon: Dict,
+    def __init__(self, name: str, power: int, hp: int,
+                 armour: Optional[List[Dict]], weapon: Dict,
                  potion: Optional[Dict]):
         self.name = name
         self.base_power = power
@@ -42,8 +43,44 @@ def simulate_battle(knight1: Knight, knight2: Knight) -> Dict[str, int]:
     return {knight1.name: knight1.hp, knight2.name: knight2.hp}
 
 
+def battle(knights_config: Dict[str, Dict]) -> Dict[str, int]:
+    """Simulates battles between knights based on their configurations.
+
+    Args:
+        knights_config: A dictionary containing knight configurations (name, power, hp, etc.).
+
+    Returns:
+        A dictionary with the remaining HP of each knight after the battles.
+    """
+
+    # Prepare knights for battle (moved logic from main)
+    knights = {}
+    for name, config in knights_config.items():
+        knights[name] = Knight(
+            name=config["name"],
+            power=config["power"],
+            hp=config["hp"],
+            armour=config.get("armour", []),
+            weapon=config["weapon"],
+            potion=config.get("potion"),
+        )
+
+    # Simulate battles
+    results = {}
+    for attacker_name, defender_name in [("Lancelot", "Mordred"), ("Arthur", "Red Knight")]:
+        attacker = knights[attacker_name]
+        defender = knights[defender_name]
+        damage_dealt = max(0, attacker.power - defender.protection)
+        attacker.receive_damage(damage_dealt)
+        defender.receive_damage(damage_dealt)
+        results[attacker_name] = attacker.hp
+        results[defender_name] = defender.hp
+
+    return results
+
+
 def main():
-    KNIGHTS = {
+    knights = {
         "lancelot": {
             "name": "Lancelot",
             "power": 35,
@@ -130,7 +167,7 @@ def main():
         }
     }
 
-    def battle(knightsConfig):
+    def battles(knightsConfig):
         # BATTLE PREPARATIONS:
 
         # lancelot
@@ -254,4 +291,4 @@ def main():
             red_knight["name"]: red_knight["hp"],
         }
 
-    print(battle(KNIGHTS))
+    print(battles(knights))
